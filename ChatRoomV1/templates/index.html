@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .message{
+            height:300px;
+            border: 1px solid #dddddd;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="message" id="message"></div>
+<div>
+    <input type="text" placeholder="請輸入" id="txt">
+    <input type="button" value="送出" onclick="sendMessage()">
+    <input type="button" value="關閉" onclick="closeConn()">
+</div>
+<script>
+    var socket = new WebSocket("ws://127.0.0.1:8000/chat/");
+
+    //回調函數，建立好連線後自動觸發(self.accept)
+    socket.onopen = function(event){
+        let tag = document.createElement('div');
+        tag.innerText = '連線成功!';
+        document.getElementById('message').appendChild(tag);
+    }
+
+    //回調函數，接收後端來的資訊自動觸發
+    socket.onmessage = function(event){
+        let tag = document.createElement('div');
+        tag.innerText = event.data;
+        document.getElementById('message').appendChild(tag);
+    }
+
+    //回調函數，後端主動斷開後會觸發
+    socket.onclose = function(event){
+        let tag = document.createElement('div');
+        tag.innerText = '被後端斷開';
+        document.getElementById('message').appendChild(tag);
+    }
+
+    //傳訊息
+    function sendMessage(){
+         let tag = document.getElementById('txt');
+         socket.send(tag.value);
+    }
+
+    //關閉
+    function closeConn(){
+         socket.close();
+    }
+
+</script>
